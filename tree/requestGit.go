@@ -12,10 +12,10 @@ var gitRegexes = []*regexp.Regexp{
 
 func attemptGitDirectoryRequest(input string) (match bool, new DirectoryRequest) {
 	match, data := checkForMatch(input, gitRegexes)
+	new.raw = input
 	new.url = &url.URL{
-		Host:    data["Domain"],
-		Path:    data["Path"],
-		RawPath: input,
+		Host: data["Domain"],
+		Path: data["Path"],
 	}
 	return match, new
 }

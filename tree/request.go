@@ -6,6 +6,7 @@ import (
 )
 
 type DirectoryRequest struct {
+	raw string
 	url *url.URL
 }
 
@@ -15,6 +16,7 @@ func NewDirectoryRequest(userInput string) (new DirectoryRequest, err error) {
 			return dr, nil
 		}
 	}
+	new.raw = userInput
 	new.url, err = url.Parse(userInput)
 	return new, err
 }
