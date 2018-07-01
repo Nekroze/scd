@@ -6,6 +6,8 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+
+	"gopkg.in/src-d/go-git.v4"
 )
 
 type VCS int
@@ -40,7 +42,10 @@ func (d Directory) Ensure() error {
 	case FS:
 		err = os.MkdirAll(d.Path, os.ModePerm)
 	case Git:
-		panic("Git Clone Not Implemented")
+		_, err = git.PlainClone(d.Path, false, &git.CloneOptions{
+			URL:      d.url.String(),
+			Progress: os.Stderr,
+		})
 	}
 	return err
 }
