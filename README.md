@@ -52,6 +52,8 @@ This will allow `scd` to attempt to decide a smart location to put things and re
 
 ### Changing Directory With Fuzzy Matching
 
+NOTE: This feature is not yet implemented!
+
 To better facilitate rapid switching between directories `scd` can allow fuzzy matching of directories:
 
 ```bash
@@ -64,3 +66,5 @@ To better facilitate rapid switching between directories `scd` can allow fuzzy m
 ```
 
 By default `scd` records weights for directories `scd` has changed you too.
+
+NOTE: This feature is not yet implemented!
