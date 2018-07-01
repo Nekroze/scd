@@ -3,7 +3,6 @@
 package tree
 
 import (
-	"net/url"
 	"os"
 	"path/filepath"
 
@@ -19,8 +18,7 @@ const (
 
 type Directory struct {
 	Path string // The absolute path to this directory.
-	Type VCS    // The type of directory either FS or a VCS.
-	url  *url.URL
+	req  DirectoryRequest
 }
 
 func (d Directory) exists() (exists bool, err error) {
@@ -38,12 +36,12 @@ func (d Directory) Ensure() error {
 	if exists || err != nil {
 		return err
 	}
-	switch d.Type {
+	switch d.req.vcs {
 	case FS:
 		err = os.MkdirAll(d.Path, os.ModePerm)
 	case Git:
 		_, err = git.PlainClone(d.Path, false, &git.CloneOptions{
-			URL:      d.url.String(),
+			URL:      d.req.raw,
 			Progress: os.Stderr,
 		})
 	}
@@ -52,19 +50,19 @@ func (d Directory) Ensure() error {
 
 func DetermineDirectory(req DirectoryRequest) (out Directory) {
 	parts := []string{}
-	out.url = req.url
-	switch req.url.Scheme {
-	case "git":
-		out.Type = Git
+	out.req = req
+	switch req.vcs {
+	case Git:
 		parts = append(parts, []string{
 			os.Getenv("HOME"),
 			"git",
 			req.url.Host,
 			req.url.Path,
 		}...)
-	default:
-		out.Type = FS
+	case FS:
 		parts = append(parts, req.url.Path)
+	default:
+		parts = append(parts, req.raw)
 	}
 	out.Path = filepath.Join(parts...)
 	return out
