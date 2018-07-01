@@ -8,17 +8,17 @@ import (
 type DirectoryRequest struct {
 	raw string
 	url *url.URL
+	vcs VCS // The type of directory either FS or a VCS.
 }
 
-func NewDirectoryRequest(userInput string) (new DirectoryRequest, err error) {
+func NewDirectoryRequest(userInput string) DirectoryRequest {
 	for _, generator := range drGenerators {
 		if ok, dr := generator(userInput); ok {
-			return dr, nil
+			return dr
 		}
 	}
-	new.raw = userInput
-	new.url, err = url.Parse(userInput)
-	return new, err
+	_, new := generateFSDirectoryRequest(userInput)
+	return new
 }
 
 func mapSubexpNames(m, n []string) map[string]string {

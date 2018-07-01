@@ -13,10 +13,7 @@ func Entrypoint() {
 		return
 	}
 	pathInput := os.Args[1]
-	req, err := tree.NewDirectoryRequest(pathInput)
-	if err != nil {
-		panic(err)
-	}
+	req := tree.NewDirectoryRequest(pathInput)
 	dir := tree.DetermineDirectory(req)
 	if e := dir.Ensure(); e != nil {
 		panic(e)
