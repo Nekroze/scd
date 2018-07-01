@@ -14,6 +14,14 @@ Installation can be done directly via the outstanding [Go][1] programming langua
 
 If your `$GOPATH` and `$PATH` environment variables are properly configured the `scd` command will now be available in your terminal.
 
+Due to the way the current working directory functions in a shell you will need to utilize a wrapper around `scd` to perform the final directory change. This can all be done by sourcing the `s.sh` file in your `~/.bashrc` or equivelant.
+
+```
+source s.sh
+```
+
+Once this line is executed you should have an `s` function/command at your disposal. If you use `scd` directly it will still perform all its functionality except the directory to change to will be printed to the terminal instead of changed to.
+
 ## Usage
 
 There are many ways you can let `scd` help simplify your life.
@@ -24,7 +32,7 @@ You can use `scd` the same way you would use `cd` normally:
 
 ```bash
 [nekroze ~]$ mkdir things
-[nekroze ~]$ scd things
+[nekroze ~]$ s things
 [nekroze ~/scd]$
 ```
 
@@ -33,10 +41,10 @@ You can use `scd` the same way you would use `cd` normally:
 When `scd` is given vcs repository URI it will clone it if it has not already been cloned then change directory into the repository:
 
 ```bash
-[nekroze ~]$ scd https://github.com/Nekroze/scd
+[nekroze ~]$ s https://github.com/Nekroze/scd
 ... runs a git clone ...
 [nekroze ~/git/github.com/Nekroze/scd]$
-[nekroze ~]$ scd git@github.com/Nekroze/scd
+[nekroze ~]$ s git@github.com/Nekroze/scd
 [nekroze ~/git/github.com/Nekroze/scd]$
 ```
 
@@ -47,11 +55,11 @@ This will allow `scd` to attempt to decide a smart location to put things and re
 To better facilitate rapid switching between directories `scd` can allow fuzzy matching of directories:
 
 ```bash
-[nekroze ~]$ scd https://github.com/Nekroze/scd
+[nekroze ~]$ s https://github.com/Nekroze/scd
 [nekroze ~/git/github.com/Nekroze/scd]$ cd
-[nekroze ~]$ scd scd
+[nekroze ~]$ s scd
 [nekroze ~/git/github.com/Nekroze/scd]$ cd
-[nekroze ~]$ scd cd
+[nekroze ~]$ s cd
 [nekroze ~/git/github.com/Nekroze/scd]$
 ```
 

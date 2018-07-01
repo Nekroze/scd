@@ -9,8 +9,8 @@ import (
 
 func Entrypoint() {
 	if len(os.Args) != 2 {
-		fmt.Println("You must provide an argument")
-		os.Exit(1)
+		fmt.Println(os.Getenv("HOME"))
+		return
 	}
 	pathInput := os.Args[1]
 	req, err := tree.NewDirectoryRequest(pathInput)
@@ -21,7 +21,5 @@ func Entrypoint() {
 	if e := dir.Ensure(); e != nil {
 		panic(e)
 	}
-	if e := dir.ChangeTo(); e != nil {
-		panic(e)
-	}
+	fmt.Println(dir.Path)
 }

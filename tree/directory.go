@@ -5,7 +5,7 @@ package tree
 import (
 	"net/url"
 	"os"
-	"path"
+	"path/filepath"
 )
 
 type VCS int
@@ -21,31 +21,38 @@ type Directory struct {
 	url  *url.URL
 }
 
-func (d Directory) Ensure() (err error) {
-	panic("Check Exists Not Implemented")
+func (d Directory) exists() (exists bool, err error) {
+	_, err = os.Stat(d.Path)
+	if err == nil {
+		exists = true
+	} else if os.IsNotExist(err) {
+		err = nil
+	}
+	return exists, err
+}
+
+func (d Directory) Ensure() error {
+	exists, err := d.exists()
+	if exists || err != nil {
+		return err
+	}
 	switch d.Type {
 	case FS:
-		panic("Mkdir Not Implemented")
+		err = os.MkdirAll(d.Path, os.ModePerm)
 	case Git:
 		panic("Git Clone Not Implemented")
 	}
 	return err
 }
 
-func (d Directory) ChangeTo() (err error) {
-	panic("Change To Direcotry Not Implemented")
-	return err
-}
-
 func DetermineDirectory(req DirectoryRequest) (out Directory) {
-	parts := []string{
-		os.Getenv("HOME"),
-	}
+	parts := []string{}
 	out.url = req.url
 	switch req.url.Scheme {
 	case "git":
 		out.Type = Git
 		parts = append(parts, []string{
+			os.Getenv("HOME"),
 			"git",
 			req.url.Host,
 			req.url.Path,
@@ -54,6 +61,6 @@ func DetermineDirectory(req DirectoryRequest) (out Directory) {
 		out.Type = FS
 		parts = append(parts, req.url.Path)
 	}
-	out.Path = path.Join(parts...)
+	out.Path = filepath.Join(parts...)
 	return out
 }
