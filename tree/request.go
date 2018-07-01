@@ -1,14 +1,14 @@
 package tree
 
+import (
+	"net/url"
+)
+
 type DirectoryRequest struct {
-	RawPath   string // The exact user input.
-	Directory string // The final element of the RawPath.
-	Path      string // Everthing except the final element of RawPath.
-	Schema    string // If RawPath is a URI such as https://github.com/Nekroze/scd this would be https
+	url *url.URL
 }
 
-func NewDirectoryRequest(userInput string) (new DirectoryRequest) {
-	new.RawPath = userInput
-	panic("Not Implemented")
-	return new
+func NewDirectoryRequest(userInput string) (new DirectoryRequest, err error) {
+	new.url, err = url.Parse(userInput)
+	return
 }

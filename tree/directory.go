@@ -2,6 +2,12 @@
 // should be located.
 package tree
 
+import (
+	"net/url"
+	"os"
+	"path"
+)
+
 type VCS int
 
 const (
@@ -12,6 +18,7 @@ const (
 type Directory struct {
 	Path string // The absolute path to this directory.
 	Type VCS    // The type of directory either FS or a VCS.
+	url  *url.URL
 }
 
 func (d Directory) Ensure() (err error) {
@@ -31,6 +38,22 @@ func (d Directory) ChangeTo() (err error) {
 }
 
 func DetermineDirectory(req DirectoryRequest) (out Directory) {
-	panic("Not Implemented")
+	parts := []string{
+		os.Getenv("HOME"),
+	}
+	out.url = req.url
+	switch req.url.Scheme {
+	case "git":
+		out.Type = Git
+		parts = append(parts, []string{
+			"git",
+			req.url.Host,
+			req.url.Path,
+		}...)
+	default:
+		out.Type = FS
+		parts = append(parts, req.url.Path)
+	}
+	out.Path = path.Join(parts...)
 	return out
 }
