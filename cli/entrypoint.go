@@ -14,7 +14,7 @@ func Entrypoint() {
 	}
 	pathInput := os.Args[1]
 	req := tree.NewDirectoryRequest(pathInput)
-	dir := tree.DetermineDirectory(req)
+	dir := tree.NewDirectory(req)
 	if e := dir.Ensure(); e != nil {
 		panic(e)
 	}

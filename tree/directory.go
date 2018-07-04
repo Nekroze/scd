@@ -48,7 +48,7 @@ func (d Directory) Ensure() error {
 	return err
 }
 
-func DetermineDirectory(req DirectoryRequest) (out Directory) {
+func NewDirectory(req DirectoryRequest) (out Directory) {
 	parts := []string{}
 	out.req = req
 	switch req.vcs {
