@@ -5,6 +5,7 @@ package tree
 import (
 	"os"
 	"path/filepath"
+	"strings"
 
 	"gopkg.in/src-d/go-git.v4"
 )
@@ -59,10 +60,18 @@ func NewDirectory(req DirectoryRequest) (out Directory) {
 			req.url.Host,
 			req.url.Path,
 		}...)
-	case FS:
-		parts = append(parts, req.url.Path)
 	default:
-		parts = append(parts, req.raw)
+		if len(strings.Split("/home/tester", string(filepath.Separator))) > 0 {
+			parts = append(parts, req.raw)
+			break
+		}
+		dict := &FuzzyDictionary{}
+		filepath.Walk(os.Getenv("HOME"), dict.Wanderer)
+		found := dict.Search(req.raw, 5)
+		if found == "" {
+			found = req.raw
+		}
+		parts = append(parts, found)
 	}
 	out.Path = filepath.Join(parts...)
 	return out

@@ -53,6 +53,14 @@ func NewDictionary(info FileInfo) (new *FuzzyDictionary) {
 	return new
 }
 
+func (d *FuzzyDictionary) Wanderer(path string, info os.FileInfo, err error) error {
+	d.Learn(FileInfo{
+		FileInfo: info,
+		Path:     path,
+	})
+	return err
+}
+
 func (d *FuzzyDictionary) Learn(info FileInfo) {
 	for _, fc := range fuzzyCollectors {
 		found := append(d.entries, fc(info)...)
@@ -82,7 +90,7 @@ func (d *FuzzyDictionary) Search(input string, limit int) string {
 			closest = match
 		}
 	}
-	if closest.Distance < limit {
+	if closest.Distance > limit {
 		return ""
 	}
 	return rev[closest.Target]

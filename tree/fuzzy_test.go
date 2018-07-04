@@ -32,42 +32,35 @@ func makeFileInfo(dir bool, name string) os.FileInfo {
 	}
 }
 
-func Test_fuzzyGitCollector(t *testing.T) {
+func TestFuzzyGitCollector(t *testing.T) {
 	type args struct {
-		info FileInfo
 	}
 	tests := []struct {
 		name string
-		args args
+		arg  FileInfo
 		want []entry
 	}{
 		{
 			name: "empty result for file",
-			args: args{
-				info: FileInfo{
-					FileInfo: makeFileInfo(false, "thing"),
-					Path:     "~/thing",
-				},
+			arg: FileInfo{
+				FileInfo: makeFileInfo(false, "thing"),
+				Path:     "~/thing",
 			},
 			want: []entry{},
 		},
 		{
 			name: "empty result for non .git dir",
-			args: args{
-				info: FileInfo{
-					FileInfo: makeFileInfo(true, "thing"),
-					Path:     "~/thing",
-				},
+			arg: FileInfo{
+				FileInfo: makeFileInfo(true, "thing"),
+				Path:     "~/thing",
 			},
 			want: []entry{},
 		},
 		{
 			name: "parent result for .git dir",
-			args: args{
-				info: FileInfo{
-					FileInfo: makeFileInfo(true, ".git"),
-					Path:     "/thing/.git",
-				},
+			arg: FileInfo{
+				FileInfo: makeFileInfo(true, ".git"),
+				Path:     "/thing/.git",
 			},
 			want: []entry{{
 				path: "/thing/",
@@ -76,11 +69,9 @@ func Test_fuzzyGitCollector(t *testing.T) {
 		},
 		{
 			name: "parent result for realistic .git dir",
-			args: args{
-				info: FileInfo{
-					FileInfo: makeFileInfo(true, ".git"),
-					Path:     "/home/nekroze/git/github.com/Nekroze/scd/.git",
-				},
+			arg: FileInfo{
+				FileInfo: makeFileInfo(true, ".git"),
+				Path:     "/home/nekroze/git/github.com/Nekroze/scd/.git",
 			},
 			want: []entry{{
 				path: "/home/nekroze/git/github.com/Nekroze/scd/",
@@ -90,7 +81,73 @@ func Test_fuzzyGitCollector(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equal(t, tt.want, fuzzyGitCollector(tt.args.info))
+			assert.Equal(t, tt.want, fuzzyGitCollector(tt.arg))
+		})
+	}
+}
+
+func TestFuzzyDictionary_Search(t *testing.T) {
+	type args struct {
+		input string
+		limit int
+	}
+	tests := []struct {
+		name    string
+		entries []entry
+		args    args
+		want    string
+	}{
+		{
+			name:    "no entry gives no output",
+			entries: []entry{},
+			args: args{
+				input: "foo",
+				limit: 4,
+			},
+			want: "",
+		},
+		{
+			name: "no input gives no output",
+			entries: []entry{
+				{path: "~/thing/", hay: "thing"},
+			},
+			args: args{
+				input: "",
+				limit: 4,
+			},
+			want: "",
+		},
+		{
+			name: "exact input gives same output",
+			entries: []entry{
+				{path: "~/foo/", hay: "foo"},
+				{path: "~/bar/", hay: "bar"},
+			},
+			args: args{
+				input: "foo",
+				limit: 4,
+			},
+			want: "~/foo/",
+		},
+		{
+			name: "exact input gives same output with ambiguous dictionary",
+			entries: []entry{
+				{path: "~/foo/", hay: "foo"},
+				{path: "~/foish/", hay: "foish"},
+			},
+			args: args{
+				input: "foo",
+				limit: 4,
+			},
+			want: "~/foo/",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			d := &FuzzyDictionary{
+				entries: tt.entries,
+			}
+			assert.Equal(t, tt.want, d.Search(tt.args.input, tt.args.limit))
 		})
 	}
 }
