@@ -2,10 +2,17 @@ package tree
 
 import (
 	"os"
+	"path/filepath"
 	"sort"
 
 	"github.com/renstrom/fuzzysearch/fuzzy"
 )
+
+//go:generate moq -out fileinfo_moq_test.go . osFileInfo
+
+type osFileInfo interface {
+	os.FileInfo
+}
 
 type FileInfo struct {
 	os.FileInfo
@@ -16,7 +23,21 @@ type FileInfo struct {
 // dictionary for fuzzy matching.
 type FuzzyCollector func(FileInfo) []entry
 
-var fuzzyCollectors = []FuzzyCollector{}
+var fuzzyCollectors = []FuzzyCollector{
+	fuzzyGitCollector,
+}
+
+func fuzzyGitCollector(info FileInfo) []entry {
+	out := []entry{}
+	path, dir := filepath.Split(info.Path)
+	if info.IsDir() && dir == ".git" {
+		out = append(out, entry{
+			path: path,
+			hay:  filepath.Base(path),
+		})
+	}
+	return out
+}
 
 type entry struct {
 	path string // the directory that hay corresponds to
