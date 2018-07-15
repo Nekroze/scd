@@ -58,7 +58,7 @@ func NewDirectory(req DirectoryRequest) (out Directory) {
 			os.Getenv("HOME"),
 			"git",
 			req.url.Host,
-			req.url.Path,
+			strings.TrimSuffix(req.url.Path, ".git"),
 		}...)
 	default:
 		if len(strings.Split(req.raw, string(filepath.Separator))) > 0 {
