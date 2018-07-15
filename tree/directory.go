@@ -61,7 +61,7 @@ func NewDirectory(req DirectoryRequest) (out Directory) {
 			req.url.Path,
 		}...)
 	default:
-		if len(strings.Split("/home/tester", string(filepath.Separator))) > 0 {
+		if len(strings.Split(req.raw, string(filepath.Separator))) > 0 {
 			parts = append(parts, req.raw)
 			break
 		}
