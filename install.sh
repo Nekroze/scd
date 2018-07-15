@@ -9,6 +9,7 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 
+go get -v github.com/Nekroze/scd/...
 go install github.com/Nekroze/scd
 
 if ! grep -q "^source .*/s\\.sh$" ~/.bashrc; then
