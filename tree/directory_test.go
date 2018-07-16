@@ -48,7 +48,19 @@ func TestNewDirectory(t *testing.T) {
 				},
 				vcs: Git,
 			},
-			wantPath: os.Getenv("HOME") + "/git/github.com/Nekroze/scd.git",
+			wantPath: os.Getenv("HOME") + "/git/github.com/Nekroze/scd",
+		},
+		{
+			name: "ssh github",
+			arg: DirectoryRequest{
+				raw: "git@github.com:Nekroze/scd.git",
+				url: &url.URL{
+					Host: "github.com",
+					Path: "Nekroze/scd.git",
+				},
+				vcs: Git,
+			},
+			wantPath: os.Getenv("HOME") + "/git/github.com/Nekroze/scd",
 		},
 	}
 	for _, tt := range tests {
